@@ -79,6 +79,7 @@
 
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Typography } from '@mui/material';
 import { TextField } from '@mui/material';
@@ -86,7 +87,11 @@ import { Container } from '@mui/material';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode'; 
 
-const LoginPage = ({setid ,setRole}) => {
+const LoginPage = ({setid ,setRole,Role}) => {
+
+ const navigate =useNavigate();
+  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -107,20 +112,31 @@ const LoginPage = ({setid ,setRole}) => {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
       });
-
+      
       const encodedToken = response.data;
       const decodedToken = jwt_decode(encodedToken);
       const UserId = decodedToken.nameid;
       setid(UserId);
       const UserRole = decodedToken.role;
       setRole(UserRole);
+      // localStorage.setItem('decodedToken', JSON.stringify(decodedToken));
       console.log('Decoded Token:', decodedToken);
       console.log('UserId:', UserId);
       console.log('UserRole:', UserRole);
       console.log('Login success:', response.data);  
-    } catch (error) {
-      console.error('Error during login:', error.response.data);
+
+      //  navigate('/agent');
+
+
     }
+    catch (error) {
+      if (error.response && error.response.data) {
+        console.error('Error during login:', error.response.data);
+      } else {
+        console.error('An error occurred:', error.message);
+      }
+    }
+    
   };
 
   return (
@@ -153,9 +169,11 @@ const LoginPage = ({setid ,setRole}) => {
           variant="outlined"
         />
         <Button type="submit" variant="contained" color="primary">
-          Login
+        Submit
         </Button>
+        
       </form>
+     
     </Container>
   );
 };
